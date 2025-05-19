@@ -1,9 +1,10 @@
-import React from 'react'
+
 
 const LandingPage = () => {
+
   return (
-    <div>
-      SAJED will work here
+    <div className="flex flex-col items-center justify-center">
+      SAJED will work on LandingPage.jsx
     </div>
   )
 }
