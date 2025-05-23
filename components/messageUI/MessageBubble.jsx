@@ -1,7 +1,7 @@
 import React from 'react';
 
 const MessageBubble = ({ isOwn, userAvatar, userName, timestamp, text }) => (
-  <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in my-2`}>
+  <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in my-1`}>
     <div className={`flex items-end gap-2 max-w-[90vw] sm:max-w-lg ${isOwn ? 'flex-row-reverse' : ''}`}>
       <img
         src={userAvatar || 'https://ui-avatars.com/api/?name=User'}

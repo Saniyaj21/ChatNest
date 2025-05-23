@@ -17,6 +17,7 @@ const GlobalChat = () => {
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
     const typingRef = useRef(null);
+    const inputRef = useRef(null);
     const [activeUsers, setActiveUsers] = useState(1);
     const [typingUsers, setTypingUsers] = useState([]);
 
@@ -91,6 +92,10 @@ const GlobalChat = () => {
             });
             setInput('');
             socket.emit('typing', { userId, userName, userAvatar, isTyping: false });
+            // Focus input after sending message
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 0);
         }
     };
 
@@ -131,6 +136,7 @@ const GlobalChat = () => {
                 {/* Input */}
                 <form onSubmit={handleSend} className="flex gap-2 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 bg-white/30 sm:rounded-b-3xl rounded-b-xl border-t border-white/30 shadow-inner">
                     <input
+                        ref={inputRef}
                         className="flex-1 border-none rounded-xl px-2 sm:px-4 py-2 bg-white/70 focus:bg-white/90 focus:ring-2 focus:ring-blue-400 outline-none text-gray-800 placeholder-gray-400 shadow-md transition-all duration-200 text-sm sm:text-base"
                         type="text"
                         value={input}
