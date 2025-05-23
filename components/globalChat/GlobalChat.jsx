@@ -113,7 +113,7 @@ const GlobalChat = () => {
                 </div>
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-2 sm:py-3 space-y-2 bg-white/40 backdrop-blur-md sm:rounded-b-3xl rounded-b-xl scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent transition-all duration-300">
-                    <div className="pt-4">
+                    <div className="pt-4 flex flex-col justify-end min-h-full">
                         {messages.map((msg, idx) => (
                             <MessageBubble
                                 key={idx}
