@@ -7,23 +7,39 @@ import { useUser } from '@clerk/nextjs';
 const GlobalChat = () => {
     const { user } = useUser();
     const userId = user?.id;
+    const userName = user?.fullName || 'Anonymous';
+    const userAvatar = user?.imageUrl || 'https://ui-avatars.com/api/?name=User';
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
     const [activeUsers, setActiveUsers] = useState(1);
+    const [typingUsers, setTypingUsers] = useState([]);
 
     useEffect(() => {
         const onConnect = () => console.log('Socket connected:', socket.id);
         const onDisconnect = () => console.log('Socket disconnected');
         const onGlobalMessage = (msg) => {
             setMessages((prev) => [...prev, msg]);
+            setTypingUsers((prev) => prev.filter((u) => u.userId !== msg.userId));
         };
         const onActiveUsers = (count) => setActiveUsers(count);
+        const onTyping = (typingData) => {
+            setTypingUsers((prev) => {
+                // Remove if already present
+                const filtered = prev.filter((u) => u.userId !== typingData.userId);
+                if (typingData.isTyping) {
+                    return [...filtered, typingData];
+                } else {
+                    return filtered;
+                }
+            });
+        };
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('global message', onGlobalMessage);
         socket.on('active users', onActiveUsers);
+        socket.on('typing', onTyping);
 
         // Clean up on unmount
         return () => {
@@ -31,6 +47,7 @@ const GlobalChat = () => {
             socket.off('disconnect', onDisconnect);
             socket.off('global message', onGlobalMessage);
             socket.off('active users', onActiveUsers);
+            socket.off('typing', onTyping);
         };
     }, []);
 
@@ -39,11 +56,29 @@ const GlobalChat = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    const typingTimeout = useRef();
+    const handleInputChange = (e) => {
+        setInput(e.target.value);
+        if (!userId) return;
+        socket.emit('typing', { userId, userName, userAvatar, isTyping: true });
+        clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => {
+            socket.emit('typing', { userId, userName, userAvatar, isTyping: false });
+        }, 1200);
+    };
+
     const handleSend = (e) => {
         e.preventDefault();
         if (input.trim() !== '' && userId) {
-            socket.emit('global message', { text: input, userId });
+            socket.emit('global message', {
+                text: input,
+                userId,
+                userName,
+                userAvatar,
+                timestamp: new Date().toISOString(),
+            });
             setInput('');
+            socket.emit('typing', { userId, userName, userAvatar, isTyping: false });
         }
     };
 
@@ -76,17 +111,54 @@ const GlobalChat = () => {
                                 key={idx}
                                 className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in`}
                             >
-                                <div
-                                    className={`relative px-3 sm:px-4 py-2 rounded-2xl max-w-[90vw] sm:max-w-lg shadow-md backdrop-blur-md ${isOwn ? 'bg-gradient-to-br from-blue-500/90 to-purple-500/80 text-white' : 'bg-white/80 text-gray-800 border border-blue-100'} transition-all duration-300 text-sm sm:text-base`}
-                                >
-                                    <span className="font-mono text-[9px] sm:text-[10px] text-gray-300 block mb-1">
-                                        {isOwn ? 'You' : (msg.userId?.slice(-4) || 'user')}
-                                    </span>
-                                    <span className="leading-snug break-words">{msg.text || msg.message}</span>
+                                <div className={`flex items-end gap-2 max-w-[90vw] sm:max-w-lg ${isOwn ? 'flex-row-reverse' : ''}`}>
+                                    <img
+                                        src={msg.userAvatar || 'https://ui-avatars.com/api/?name=User'}
+                                        alt={msg.userName || 'User'}
+                                        className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md object-cover"
+                                    />
+                                    <div className={`relative px-3 sm:px-4 py-2 rounded-2xl shadow-md backdrop-blur-md ${isOwn ? 'bg-gradient-to-br from-blue-500/90 to-purple-500/80 text-white' : 'bg-white/80 text-gray-800 border border-blue-100'} transition-all duration-300 text-sm sm:text-base`}>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="font-bold text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[120px]">{isOwn ? 'You' : msg.userName || 'User'}</span>
+                                            <span className="font-mono text-[9px] sm:text-[10px] text-gray-400">
+                                                {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                            </span>
+                                        </div>
+                                        <span className="leading-snug break-words">{msg.text || msg.message}</span>
+                                    </div>
                                 </div>
                             </div>
                         );
                     })}
+                    {/* Typing indicator */}
+                    {typingUsers.filter(u => u.userId !== userId).length > 0 && (
+                        <>
+                            <style>{`
+                                @keyframes typingWave {
+                                    0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+                                    40% { transform: scale(1.2); opacity: 1; }
+                                }
+                            `}</style>
+                            <div className="flex items-center gap-1 animate-fade-in ml-0 pl-0">
+                                <div className="flex items-center -space-x-2">
+                                    {typingUsers.filter(u => u.userId !== userId).map((u, idx) => (
+                                        <img
+                                            key={u.userId}
+                                            src={u.userAvatar || 'https://ui-avatars.com/api/?name=User'}
+                                            alt={u.userName || 'User'}
+                                            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-white shadow-md object-cover"
+                                            style={{ zIndex: 10 + idx }}
+                                        />
+                                    ))}
+                                </div>
+                                <span className="flex items-center gap-0.5 ml-2">
+                                    <span className="w-2.5 h-2.5 bg-blue-700 rounded-full inline-block" style={{ animation: 'typingWave 1.2s infinite ease-in-out both', animationDelay: '0s' }}></span>
+                                    <span className="w-2.5 h-2.5 bg-blue-700 rounded-full inline-block" style={{ animation: 'typingWave 1.2s infinite ease-in-out both', animationDelay: '0.2s' }}></span>
+                                    <span className="w-2.5 h-2.5 bg-blue-700 rounded-full inline-block" style={{ animation: 'typingWave 1.2s infinite ease-in-out both', animationDelay: '0.4s' }}></span>
+                                </span>
+                            </div>
+                        </>
+                    )}
                     <div ref={messagesEndRef} />
                 </div>
                 {/* Input */}
@@ -95,7 +167,7 @@ const GlobalChat = () => {
                         className="flex-1 border-none rounded-xl px-2 sm:px-4 py-2 bg-white/70 focus:bg-white/90 focus:ring-2 focus:ring-blue-400 outline-none text-gray-800 placeholder-gray-400 shadow-md transition-all duration-200 text-sm sm:text-base"
                         type="text"
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={handleInputChange}
                         placeholder="Type your message..."
                         disabled={!userId}
                         autoComplete="off"
