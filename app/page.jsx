@@ -1,12 +1,12 @@
-import GlobalChat from "@/components/globalChat/GlobalChat";
-import LandingPage from "@/components/home/LandingPage";
 
-
-export default function Home() {
+import React from 'react'
+import ResponsiveHome from '@/components/home/ResponsiveHome'
+const page = () => {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100 ">
-      {/* <LandingPage /> */}
-      <GlobalChat />
+    <div>
+      <ResponsiveHome />
     </div>
-  );
+  )
 }
+
+export default page
