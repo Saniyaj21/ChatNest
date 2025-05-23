@@ -154,19 +154,12 @@ const GlobalChat = () => {
                         autoComplete="off"
                     />
                     <button
-                        type="button"
-                        onClick={handleMobileSend}
-                        className="sm:hidden bg-gradient-to-br from-blue-500 to-purple-500 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-600 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center"
-                        disabled={!userId || !input.trim()}
-                    >
-                        <IoSendSharp size={20} />
-                    </button>
-                    <button
                         type="submit"
-                        className="hidden sm:flex bg-gradient-to-br from-blue-500 to-purple-500 text-white px-6 py-2 rounded-xl font-semibold shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-600 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base items-center justify-center"
+                        className="bg-gradient-to-br from-blue-500 to-purple-500 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-600 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center"
                         disabled={!userId || !input.trim()}
                     >
-                        Send
+                        <span className="sm:hidden flex items-center"><IoSendSharp size={20} /></span>
+                        <span className="hidden sm:inline">Send</span>
                     </button>
                 </form>
             </div>
