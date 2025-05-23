@@ -35,7 +35,7 @@ const Sidebar = ({
   }, [searchQuery]);
 
   return (
-    <aside className="w-80 h-full flex flex-col bg-blue-100 backdrop-blur-md">
+    <aside className="w-full max-w-[425px] h-full flex flex-col bg-blue-100 backdrop-blur-md">
       {/* Header */}<div className="flex items-center justify-between px-6 py-5 border-b border-white/30 bg-white/30 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">

@@ -45,13 +45,13 @@ const ResponsiveHome = () => {
       </div>
       {/* Sidebar for mobile (drawer) */}
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-transform duration-300 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-0 z-40 md:hidden transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         style={{ background: sidebarOpen ? "rgba(0,0,0,0.2)" : "transparent" }}
         onClick={() => setSidebarOpen(false)}
-      >        <div
-          className="h-full w-72 max-w-full bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 backdrop-blur-lg"
+      >
+        <div
+          className="h-full w-full max-w-[425px] bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 backdrop-blur-lg"
           onClick={e => e.stopPropagation()}
         >
           <Sidebar
