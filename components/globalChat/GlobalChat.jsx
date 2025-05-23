@@ -98,7 +98,7 @@ const GlobalChat = () => {
         <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60  shadow-2xl backdrop-blur-lg border border-white/40  sm:p-0 p-1">
             <div className="w-full max-w-2xl flex flex-col h-full sm:overflow-hidden overflow-visible">
                 {/* Header */}
-                <div className="flex items-center justify-between px-3 sm:px-6 py-2 sm:py-4 border-b border-white/30 bg-white/30  shadow-sm relative overflow-hidden">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-6 py-2 sm:py-4 border-b border-white/30 bg-white/30 backdrop-blur-md shadow-sm relative overflow-hidden">
                     <div className="flex items-center gap-2 sm:gap-3">
                         <div>
                             <h2 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
@@ -113,18 +113,20 @@ const GlobalChat = () => {
                 </div>
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-2 sm:py-3 space-y-2 bg-white/40 backdrop-blur-md sm:rounded-b-3xl rounded-b-xl scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent transition-all duration-300">
-                    {messages.map((msg, idx) => (
-                        <MessageBubble
-                            key={idx}
-                            isOwn={msg.userId === userId}
-                            userAvatar={msg.userAvatar}
-                            userName={msg.userName}
-                            timestamp={msg.timestamp}
-                            text={msg.text || msg.message}
-                        />
-                    ))}
-                    <TypingIndicator users={typingUsers.filter(u => u.userId !== userId)} />
-                    <div ref={messagesEndRef} />
+                    <div className="pt-4">
+                        {messages.map((msg, idx) => (
+                            <MessageBubble
+                                key={idx}
+                                isOwn={msg.userId === userId}
+                                userAvatar={msg.userAvatar}
+                                userName={msg.userName}
+                                timestamp={msg.timestamp}
+                                text={msg.text || msg.message}
+                            />
+                        ))}
+                        <TypingIndicator users={typingUsers.filter(u => u.userId !== userId)} />
+                        <div ref={messagesEndRef} />
+                    </div>
                 </div>
                 {/* Input */}
                 <form onSubmit={handleSend} className="flex gap-2 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 bg-white/30 sm:rounded-b-3xl rounded-b-xl border-t border-white/30 shadow-inner">
