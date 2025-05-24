@@ -1,9 +1,9 @@
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./globals.css";
 import {
   ClerkProvider
 } from '@clerk/nextjs'
-import PWAInstall from "@/components/PWAInstall";
+
 
 export const metadata = {
   title: "Create Next App",
@@ -14,12 +14,8 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
-          <link rel="manifest" href="/manifest.json" />
-          <meta name="theme-color" content="#6366f1" />
-        </head>
+        
         <body>
-          <PWAInstall />
           {children}
         </body>
       </html>
