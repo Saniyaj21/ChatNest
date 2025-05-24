@@ -1,6 +1,32 @@
-import React from "react";
+'use client'
+
+import React, { useEffect, useState } from "react";
 
 const LandingPage = () => {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstall, setShowInstall] = useState(false);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstall(true);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        setShowInstall(false);
+      }
+      setDeferredPrompt(null);
+    }
+  };
+
   return (
     <div className="pt-8 min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 backdrop-blur-lg px-4">
       <div className="max-w-2xl w-full text-center">
@@ -17,7 +43,14 @@ const LandingPage = () => {
           >
             Get Started
           </a>
-
+          {showInstall && (
+            <button
+              onClick={handleInstallClick}
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 via-blue-600 to-pink-500 text-white rounded-lg font-semibold shadow hover:from-purple-600 hover:to-blue-600 transition duration-300 transform hover:scale-105"
+            >
+              Download App
+            </button>
+          )}
         </div>
         <div id="features" className="mt-12">
           <h2 className="text-2xl font-bold text-purple-700 mb-4">Features</h2>
