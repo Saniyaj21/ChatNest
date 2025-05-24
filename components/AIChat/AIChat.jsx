@@ -45,7 +45,7 @@ const AIChat = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: input , context : messages }),
       });
 
       const data = await response.json();

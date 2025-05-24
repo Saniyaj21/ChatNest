@@ -16,18 +16,28 @@ async function generateAIResponse(prompt) {
 
 export async function POST(req) {
     try {
-        const { message } = await req.json();        // Construct prompt with instructions for friendly, informative responses with markdown
+        const { message, context } = await req.json();
+        
+        // Build conversation history from context
+        const conversationHistory = context.map(msg => msg.text).join('\n\n');
+        
+        // Construct prompt with instructions and conversation history
         const prompt = `You are ChatNest AI, a helpful and friendly AI assistant. Please answer the following question in a clear, informative, and conversational manner. Format your response using Markdown for better readability:
-- Use **bold** for emphasis
-- Use \`code blocks\` for code or technical terms
-- Use bullet points or numbered lists where appropriate
-- Use ### for subheadings if needed
-- Include relevant links if helpful
-- Use tables if presenting structured data
+            - Use **bold** for emphasis
+            - Use \`code blocks\` for code or technical terms
+            - Use bullet points or numbered lists where appropriate
+            - Use ### for subheadings if needed
+            - Include relevant links if helpful
+            - Use tables if presenting structured data
 
-Here's the question:
+            Previous conversation:
+            ${conversationHistory}
 
-${message}`;
+            Current question:
+            ${message}`;
+
+        console.log("Prompt sent to AI:", prompt);
+        console.log("Context sent to AI:", context);
 
         // Generate AI response
         let aiResponse = await generateAIResponse(prompt);
@@ -42,7 +52,7 @@ ${message}`;
 
     } catch (error) {
         console.error('Error generating AI response:', error);
-        
+
         return NextResponse.json({
             message: "An error occurred while processing your request.",
             success: false,
