@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import TypingDots from './TypingDots';
 
 const TypingIndicator = ({ users = [] }) => {
   const typingRef = useRef(null);
@@ -12,12 +13,6 @@ const TypingIndicator = ({ users = [] }) => {
 
   return (
     <>
-      <style>{`
-        @keyframes typingWave {
-          0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
-          40% { transform: scale(1.2); opacity: 1; }
-        }
-      `}</style>
       <div ref={typingRef} className="flex items-center gap-1 animate-fade-in ml-0 pl-0 pb-4">
         <div className="flex items-center -space-x-2">
           {users.map((u, idx) => (
@@ -30,11 +25,7 @@ const TypingIndicator = ({ users = [] }) => {
             />
           ))}
         </div>
-        <span className="flex items-center gap-0.5 ml-2">
-          <span className="w-2.5 h-2.5 bg-blue-700 rounded-full inline-block" style={{ animation: 'typingWave 1.2s infinite ease-in-out both', animationDelay: '0s' }}></span>
-          <span className="w-2.5 h-2.5 bg-blue-700 rounded-full inline-block" style={{ animation: 'typingWave 1.2s infinite ease-in-out both', animationDelay: '0.2s' }}></span>
-          <span className="w-2.5 h-2.5 bg-blue-700 rounded-full inline-block" style={{ animation: 'typingWave 1.2s infinite ease-in-out both', animationDelay: '0.4s' }}></span>
-        </span>
+        <TypingDots />
       </div>
     </>
   );

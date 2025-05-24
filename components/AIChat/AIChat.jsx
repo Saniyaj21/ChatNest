@@ -1,10 +1,11 @@
- 'use client'
+'use client'
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import MessageBubble from '../messageUI/MessageBubble';
 import AIResponseBubble from '../messageUI/AIResponseBubble';
 import { IoSendSharp } from "react-icons/io5";
+import TypingDots from '../messageUI/TypingDots';
 
 const AIChat = () => {
   const { user } = useUser();
@@ -113,13 +114,7 @@ const AIChat = () => {
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm shadow-lg">
                   🤖
                 </div>
-                <div className="bg-white/70 rounded-xl p-3 shadow-md">
-                  <div className="flex space-x-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
+               <TypingDots />
               </div>
             )}
             <div ref={messagesEndRef} />
