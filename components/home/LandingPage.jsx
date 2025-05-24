@@ -2,9 +2,9 @@ import React from "react";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-white to-purple-100 px-4">
+    <div className="pt-8 min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 backdrop-blur-lg px-4">
       <div className="max-w-2xl w-full text-center">
-        <h1 className="text-5xl font-extrabold text-blue-700 mb-4 drop-shadow-lg">
+        <h1 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-lg">
           Welcome to ChatNest
         </h1>
         <p className="text-lg text-gray-700 mb-8">
@@ -13,16 +13,11 @@ const LandingPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
           <a
             href="/sign-in"
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition"
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 text-white rounded-lg font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition duration-300 transform hover:scale-105"
           >
             Get Started
           </a>
-          <a
-            href="#features"
-            className="px-8 py-3 bg-white border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition"
-          >
-            Learn More
-          </a>
+
         </div>
         <div id="features" className="mt-12">
           <h2 className="text-2xl font-bold text-purple-700 mb-4">Features</h2>
@@ -36,7 +31,7 @@ const LandingPage = () => {
         </div>
       </div>
       <footer className="mt-16 text-gray-400 text-sm">
-        &copy; {new Date().getFullYear()} ChatNest. All rights reserved.
+        &copy; 2025 ChatNest. All rights reserved.
       </footer>
     </div>
   );

@@ -5,15 +5,19 @@ import GlobalChat from '@/components/globalChat/GlobalChat'
 import AIChat from '@/components/AIChat/AIChat'
 import Sidebar from '@/components/sidebar/Sidebar'
 import LandingPage from '@/components/home/LandingPage'
-import { SignIn } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+
 const page = () => {
   return (
     <div>
-      <ResponsiveHome />
-      {/* <LandingPage />
-      <SignedIn >
 
-      </SignedIn> */}
+      <SignedIn>
+        <ResponsiveHome />
+
+      </SignedIn>
+      <SignedOut>
+        <LandingPage />
+      </SignedOut>
     </div>
   )
 }
