@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FaSearch, FaUsers, FaGlobe, FaRobot } from 'react-icons/fa';
 
@@ -90,6 +91,15 @@ const Sidebar = ({
         <div className="px-6 pt-4 pb-6">
           <h2 className="text-base font-bold text-purple-700 mb-2 tracking-tight flex items-center gap-2">
             <FaUsers className="text-purple-400" /> Groups
+            <Link
+              href="/create-group"
+              className="ml-auto flex items-center justify-center w-7 h-7 rounded-full bg-purple-200 hover:bg-purple-400 text-purple-700 hover:text-white transition-colors text-lg font-bold shadow"
+              aria-label="Create group"
+              onClick={() => console.log('Create group clicked')}
+              type="button"
+            >
+              +
+            </Link>
           </h2>          <ul className="space-y-1">
             {filteredData.groups.map(group => (
               <li
