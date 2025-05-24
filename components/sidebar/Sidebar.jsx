@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useMemo } from 'react';
 import { FaSearch, FaUsers, FaGlobe, FaRobot } from 'react-icons/fa';
 

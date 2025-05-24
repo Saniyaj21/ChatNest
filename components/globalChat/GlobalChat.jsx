@@ -21,14 +21,23 @@ const GlobalChat = () => {
     const [activeUsers, setActiveUsers] = useState(1);
     const [typingUsers, setTypingUsers] = useState([]);
 
+    console.log(activeUsers)
+
     useEffect(() => {
-        const onConnect = () => console.log('Socket connected:', socket.id);
+        const onConnect = () => {
+            console.log('Socket connected:', socket.id);
+            // Request initial active users count
+            socket.emit('getActiveUsers');
+        };
         const onDisconnect = () => console.log('Socket disconnected');
         const onGlobalMessage = (msg) => {
             setMessages((prev) => [...prev, msg]);
             setTypingUsers((prev) => prev.filter((u) => u.userId !== msg.userId));
         };
-        const onActiveUsers = (count) => setActiveUsers(count);
+        const onActiveUsers = (count) => {
+            setActiveUsers(count);
+            console.log(count)
+        };
         const onTyping = (typingData) => {
             setTypingUsers((prev) => {
                 // Remove if already present
@@ -43,19 +52,24 @@ const GlobalChat = () => {
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
-        socket.on('global message', onGlobalMessage);
-        socket.on('active users', onActiveUsers);
+        socket.on('globalMessage', onGlobalMessage);
+        socket.on('activeUsers', onActiveUsers);
         socket.on('typing', onTyping);
+
+        // If already connected, call onConnect manually
+        if (socket.connected) {
+            onConnect();
+        }
 
         // Clean up on unmount
         return () => {
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
-            socket.off('global message', onGlobalMessage);
-            socket.off('active users', onActiveUsers);
+            socket.off('globalMessage', onGlobalMessage);
+            socket.off('activeUsers', onActiveUsers);
             socket.off('typing', onTyping);
         };
-    }, []);
+    }, []); // Remove activeUsers from dependency array
 
     useEffect(() => {
         // Scroll to bottom when messages change
@@ -83,7 +97,7 @@ const GlobalChat = () => {
     const handleSend = (e) => {
         e.preventDefault();
         if (input.trim() !== '' && userId) {
-            socket.emit('global message', {
+            socket.emit('globalMessage', {
                 text: input,
                 userId,
                 userName,
