@@ -38,21 +38,14 @@ const Sidebar = ({
   }, [searchQuery]);
 
   return (
-    <aside className="w-full max-w-[425px] h-full flex flex-col bg-blue-100 backdrop-blur-md">
-      {/* Header */}<div className="flex items-center justify-between px-6 py-5 border-b border-white/30 bg-white/30 backdrop-blur-md">
+    <aside className="w-full h-full flex flex-col bg-blue-100 backdrop-blur-md">
+      {/* Header */}
+      <div className="flex items-center px-6 py-5 border-b border-white/30 bg-white/30 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
             ChatNest
           </span>
         </div>
-        <button 
-          className="md:hidden text-gray-600 hover:text-gray-800 transition-colors"          onClick={onClose}
-          aria-label="Close sidebar"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
       </div>
       {/* Search Bar */}
       <div className="px-6 py-3 bg-white/40 backdrop-blur-md border-b border-white/20">

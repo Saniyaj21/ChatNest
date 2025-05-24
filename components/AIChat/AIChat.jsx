@@ -7,7 +7,7 @@ import AIResponseBubble from '../messageUI/AIResponseBubble';
 import { IoSendSharp } from "react-icons/io5";
 import TypingDots from '../messageUI/TypingDots';
 
-const AIChat = () => {
+const AIChat = (props) => {
   const { user } = useUser();
   const userId = user?.id;
   const userName = user?.fullName || 'Anonymous';
@@ -81,12 +81,20 @@ const AIChat = () => {
         {/* Header */}
         <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-6 py-2 sm:py-4 border-b border-white/30 bg-white/30 backdrop-blur-md shadow-sm overflow-hidden">
           <div className="flex items-center gap-2 sm:gap-3">
-            <div>
-              <h2 className="text-xl sm:text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
+            {/* Mobile: back arrow and title */}
+            <div className="flex items-center gap-2 sm:hidden">
+              <button onClick={props.onBack} className="focus:outline-none p-1" aria-label="Back to sidebar">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">ChatNest AI</h2>
+            </div>
+            {/* Desktop: original header */}
+            <div className="hidden sm:block">
+              <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
                 ChatNest AI
               </h2>
-              <span className="text-[10px] sm:text-xs text-gray-600 font-medium italic ml-1">Your AI assistant, ready to help.</span>
             </div>
+            {/* <span className="text-[10px] sm:text-xs text-gray-600 font-medium italic ml-1">Your AI assistant, ready to help.</span> */}
           </div>
           {/* Glowing effect */}
           <div className="absolute -top-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-blue-400/30 via-purple-400/20 to-pink-400/10 rounded-full blur-2xl pointer-events-none animate-pulse-slow"></div>
