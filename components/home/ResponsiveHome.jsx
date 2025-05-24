@@ -4,11 +4,26 @@ import Sidebar from "@/components/sidebar/Sidebar";
 import GlobalChat from "@/components/globalChat/GlobalChat";
 import AIChat from "@/components/AIChat/AIChat";
 import GroupChat from "@/components/groupChat/GroupChat";
-import { FaBars } from "react-icons/fa";
+
 
 const groups = [
   { id: 1, name: 'Family', lastMessage: 'Dinner at 8?', avatar: null },
   { id: 2, name: 'Work', lastMessage: 'Meeting at 10am.', avatar: null },
+  { id: 3, name: 'College Friends', lastMessage: 'Weekend plans?', avatar: null },
+  { id: 4, name: 'Book Club', lastMessage: 'Next book: The Alchemist', avatar: null },
+  { id: 5, name: 'Gaming Squad', lastMessage: 'Anyone up for Valorant?', avatar: null },
+  { id: 6, name: 'Project Alpha', lastMessage: 'Code review needed', avatar: null },
+  { id: 7, name: 'Yoga Class', lastMessage: 'Session at 7am tomorrow', avatar: null },
+  { id: 8, name: 'Neighbors', lastMessage: 'Building meeting tonight', avatar: null },
+  { id: 9, name: 'Travel Planning', lastMessage: 'Checking flight prices', avatar: null },
+  { id: 10, name: 'Movie Club', lastMessage: 'New releases this week?', avatar: null },
+  { id: 11, name: 'Football Team', lastMessage: 'Practice at 5pm', avatar: null },
+  { id: 12, name: 'Photography', lastMessage: 'Amazing sunset shots!', avatar: null },
+  { id: 13, name: 'Music Band', lastMessage: 'Rehearsal tomorrow', avatar: null },
+  { id: 14, name: 'Cooking Class', lastMessage: 'Italian cuisine week', avatar: null },
+  { id: 15, name: 'Tech Support', lastMessage: 'Server updates complete', avatar: null },
+  { id: 16, name: 'Startup Team', lastMessage: 'Investor meeting prep', avatar: null },
+  { id: 17, name: 'Language Exchange', lastMessage: '¡Hola! Practice time', avatar: null }
 ];
 
 const ResponsiveHome = () => {
@@ -43,10 +58,10 @@ const ResponsiveHome = () => {
   const selectedGroup = typeof selectedChat === 'number' ? groups.find(g => g.id === selectedChat) : null;
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar for desktop */}
-      <div className="hidden md:block h-full">
+    <div className="flex h-screen bg-gray-100">      {/* Sidebar for desktop */}      
+      <div className="hidden md:block h-full w-[320px]">
         <Sidebar
+          groups={groups}
           onGroupClick={handleGroupClick}
           onGlobalChatClick={handleGlobalChatClick}
           onAIClick={handleAIClick}
@@ -62,6 +77,7 @@ const ResponsiveHome = () => {
           onClick={e => e.stopPropagation()}
         >
           <Sidebar
+            groups={groups}
             onGroupClick={handleGroupClick}
             onGlobalChatClick={handleGlobalChatClick}
             onAIClick={handleAIClick}
