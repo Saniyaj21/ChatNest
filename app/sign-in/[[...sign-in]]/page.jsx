@@ -6,6 +6,7 @@ export default function Page() {
       {/* Glowing background effect */}
       <div className="absolute -top-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-blue-400/30 via-purple-400/20 to-pink-400/10 rounded-full blur-2xl pointer-events-none animate-pulse-slow"></div>
       <div className="relative z-10 flex flex-col justify-center items-center mt-8 w-full max-w-md px-4 py-8 bg-white/40 rounded-3xl shadow-xl backdrop-blur-md border border-white/30">
+        <img src="/chatnest-logo.png" alt="ChatNest Logo" className="mb-4 h-14 w-14 object-contain" />
         <h1 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow mb-2 text-center">
           Welcome to ChatNest
         </h1>

@@ -14,15 +14,19 @@ const GroupChat = (props) => {
               <button onClick={onBack} className="focus:outline-none p-1" aria-label="Back to sidebar">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </button>
+              <img src="/chatnest-logo.png" alt="ChatNest Logo" className="h-7 w-7 object-contain" />
               <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
                 <span>👥</span> {group.name}
               </h2>
             </div>
             {/* Desktop: original header */}
             <div className="hidden sm:block">
-              <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
-                <span>👥</span> {group.name}
-              </h2>
+              <div className="flex items-center gap-2">
+                <img src="/chatnest-logo.png" alt="ChatNest Logo" className="h-8 w-8 object-contain" />
+                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
+                  <span>👥</span> {group.name}
+                </h2>
+              </div>
             </div>
           </div>
           {/* Glowing effect */}

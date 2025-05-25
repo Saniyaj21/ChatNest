@@ -40,6 +40,7 @@ const Sidebar = ({
         {/* Logo Header */}
         <div className="flex items-center px-6 py-5 border-b border-white/30 bg-white/30 backdrop-blur-md">
           <div className="flex items-center gap-3">
+            <img src="/chatnest-logo.png" alt="ChatNest Logo" className="h-8 w-8 object-contain" />
             <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
               ChatNest
             </span>
