@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react';
-import socket from '@/lib/socket';
+import socket, { backendURL } from '@/lib/socket';
 import { useUser } from '@clerk/nextjs';
 import MessageBubble from '../messageUI/MessageBubble';
 import TypingIndicator from '../messageUI/TypingIndicator';
@@ -28,6 +28,14 @@ const GlobalChat = (props) => {
     const [uploadedImagePublicId, setUploadedImagePublicId] = useState(null);
 
     console.log(activeUsers)
+
+    // Load all previous global messages from the API
+    useEffect(() => {
+        fetch(`${backendURL}/api/global-messages`)
+            .then(res => res.json())
+            .then(data => setMessages(data))
+            .catch(err => console.error('Failed to load global messages:', err));
+    }, []);
 
     useEffect(() => {
         const onConnect = () => {
