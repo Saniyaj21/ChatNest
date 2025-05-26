@@ -225,6 +225,8 @@ const GlobalChat = (props) => {
                                 userName={msg.userName}
                                 timestamp={msg.timestamp}
                                 text={msg.text || msg.message}
+                                image={msg.image}
+                                onImageLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
                             />
                         ))}
                         <TypingIndicator users={typingUsers.filter(u => u.userId !== userId)} />

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MessageBubble = ({ isOwn, userAvatar, userName, timestamp, text }) => (
+const MessageBubble = ({ isOwn, userAvatar, userName, timestamp, text, image, onImageLoad }) => (
   <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} animate-fade-in my-1`}>
     <div className={`flex items-end gap-2 max-w-[90vw] sm:max-w-lg ${isOwn ? 'flex-row-reverse' : ''}`}>
       <img
@@ -18,6 +18,17 @@ const MessageBubble = ({ isOwn, userAvatar, userName, timestamp, text }) => (
           </span>
         </div>
         <span className="leading-snug break-words">{text}</span>
+        {image && (
+          <div className="mt-2">
+            <img
+              src={image}
+              alt="Chat Image"
+              className="max-h-48 rounded-lg border border-gray-200 shadow-sm object-contain"
+              style={{ maxWidth: '100%' }}
+              onLoad={onImageLoad}
+            />
+          </div>
+        )}
       </div>
     </div>
   </div>
