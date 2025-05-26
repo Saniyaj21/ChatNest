@@ -23,6 +23,9 @@ const GlobalChat = (props) => {
     const [typingUsers, setTypingUsers] = useState([]);
     const [imagePreview, setImagePreview] = useState(null);
     const [imageFile, setImageFile] = useState(null);
+    const [imageUploading, setImageUploading] = useState(false);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const [uploadedImagePublicId, setUploadedImagePublicId] = useState(null);
 
     console.log(activeUsers)
 
@@ -99,15 +102,22 @@ const GlobalChat = (props) => {
 
     const handleSend = (e) => {
         e.preventDefault();
-        if (input.trim() !== '' && userId) {
+        if (!userId) return;
+        console.log('Sending message:', { input, uploadedImageUrl, uploadedImagePublicId });
+        if ((input.trim() !== '' || uploadedImageUrl) && userId) {
             socket.emit('globalMessage', {
                 text: input,
                 userId,
                 userName,
                 userAvatar,
                 timestamp: new Date().toISOString(),
+                image: uploadedImageUrl,
             });
             setInput('');
+            setImageFile(null);
+            setImagePreview(null);
+            setUploadedImagePublicId(null);
+            setUploadedImageUrl(null);
             socket.emit('typing', { userId, userName, userAvatar, isTyping: false });
             // Focus input after sending message
             setTimeout(() => {
@@ -116,17 +126,63 @@ const GlobalChat = (props) => {
         }
     };
 
-    const handleImagePick = (e) => {
+    const handleImagePick = async (e) => {
         const file = e.target.files[0];
         if (file) {
             setImageFile(file);
-            setImagePreview(URL.createObjectURL(file));
+            setImagePreview(null);
+            setUploadedImageUrl(null);
+            setUploadedImagePublicId(null);
+            setImageUploading(true);
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+                console.log('Upload response:', data);
+                if (res.ok && data.url) {
+                    setUploadedImageUrl(data.url);
+                    if (data.public_id) setUploadedImagePublicId(data.public_id);
+                    setImagePreview(data.url);
+                    console.log('Image uploaded:', { url: data.url, public_id: data.public_id });
+                } else {
+                    alert(data.error || 'Image upload failed');
+                }
+            } catch (err) {
+                alert('Image upload failed');
+                console.error('Image upload error:', err);
+            } finally {
+                setImageUploading(false);
+            }
         }
     };
 
-    const handleRemoveImage = () => {
+    const handleRemoveImage = async () => {
+        // If uploadedImagePublicId exists, try to delete from Cloudinary
+        if (uploadedImagePublicId) {
+            setImagePreview(null);
+            // setImageUploading(true);
+            try {
+                console.log('Deleting image with public_id:', uploadedImagePublicId);
+                const res = await fetch('/api/delete-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ public_id: uploadedImagePublicId }),
+                });
+                const data = await res.json();
+                console.log('Delete response:', data);
+            } catch (err) {
+                // Optionally show error
+                console.error('Image delete error:', err);
+            }
+            // setImageUploading(false);
+        }
         setImageFile(null);
-        setImagePreview(null);
+        setUploadedImageUrl(null);
+        setUploadedImagePublicId(null);
     };
 
     return (
@@ -176,27 +232,43 @@ const GlobalChat = (props) => {
                     </div>
                 </div>
                 {/* Input */}
-                {imagePreview && (
+                {(imagePreview || imageUploading) && (
                     <div className="flex items-center gap-2 px-2 pb-2">
-                        <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-gray-300 shadow" />
-                        <button type="button" onClick={handleRemoveImage} className="ml-2 p-2 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition flex items-center justify-center">
-                            <FiX size={16} />
-                        </button>
+                        {imageUploading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="w-16 h-16 flex items-center justify-center">
+                                    <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                    </svg>
+                                </div>
+                                <span className="text-blue-500 font-semibold">Uploading image...</span>
+                            </div>
+                        ) : (
+                            <>
+                                <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-gray-300 shadow" />
+                                <button type="button" onClick={handleRemoveImage} className="ml-2 p-2 text-xs bg-gradient-to-br from-blue-200 to-purple-200 text-blue-700 rounded hover:from-blue-300 hover:to-purple-300 hover:text-purple-700 transition flex items-center justify-center shadow-sm border border-blue-100">
+                                    <FiX size={16} />
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
                 <form onSubmit={handleSend} className="flex gap-2 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 bg-white/30 sm:rounded-b-3xl rounded-b-xl border-t border-white/30 shadow-inner">
-                    {/* Image Picker Icon */}
-                    <label htmlFor="image-upload" className="flex items-center cursor-pointer text-blue-500 hover:text-purple-500 transition-colors">
-                        <FiImage size={24} />
-                        <input
-                            id="image-upload"
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImagePick}
-                            disabled={!userId}
-                        />
-                    </label>
+                    {/* Image Picker Icon - only show if no image is selected or uploading */}
+                    {!(imagePreview || imageUploading) && (
+                        <label htmlFor="image-upload" className="flex items-center cursor-pointer text-blue-500 hover:text-purple-500 transition-colors">
+                            <FiImage size={24} />
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleImagePick}
+                                disabled={!userId}
+                            />
+                        </label>
+                    )}
                     <input
                         ref={inputRef}
                         autoFocus
@@ -212,7 +284,7 @@ const GlobalChat = (props) => {
                     <button
                         type="submit"
                         className="bg-gradient-to-br from-blue-500 to-purple-500 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold shadow-lg hover:scale-105 hover:from-blue-600 hover:to-purple-600 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base flex items-center justify-center"
-                        disabled={!userId || !input.trim()}
+                        disabled={!userId || imageUploading || (!input.trim() && !uploadedImageUrl)}
                     >
                         <span className="sm:hidden flex items-center"><IoSendSharp size={20} /></span>
                         <span className="hidden sm:inline">Send</span>
