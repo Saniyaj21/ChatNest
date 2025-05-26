@@ -112,6 +112,7 @@ const GlobalChat = (props) => {
                 userAvatar,
                 timestamp: new Date().toISOString(),
                 image: uploadedImageUrl,
+                imagePublicId: uploadedImagePublicId
             });
             setInput('');
             setImageFile(null);
