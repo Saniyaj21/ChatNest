@@ -7,6 +7,7 @@ import MessageBubble from '../messageUI/MessageBubble';
 import TypingIndicator from '../messageUI/TypingIndicator';
 import ActiveUsersIndicator from '../messageUI/ActiveUsersIndicator';
 import { IoSendSharp } from "react-icons/io5";
+import { FiImage, FiX } from "react-icons/fi";
 
 const GlobalChat = (props) => {
     const { user } = useUser();
@@ -20,6 +21,8 @@ const GlobalChat = (props) => {
     const inputRef = useRef(null);
     const [activeUsers, setActiveUsers] = useState(1);
     const [typingUsers, setTypingUsers] = useState([]);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
 
     console.log(activeUsers)
 
@@ -113,7 +116,18 @@ const GlobalChat = (props) => {
         }
     };
 
+    const handleImagePick = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
+    const handleRemoveImage = () => {
+        setImageFile(null);
+        setImagePreview(null);
+    };
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60  shadow-2xl backdrop-blur-lg border border-white/40  sm:p-0 p-1">
@@ -162,7 +176,27 @@ const GlobalChat = (props) => {
                     </div>
                 </div>
                 {/* Input */}
+                {imagePreview && (
+                    <div className="flex items-center gap-2 px-2 pb-2">
+                        <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg border border-gray-300 shadow" />
+                        <button type="button" onClick={handleRemoveImage} className="ml-2 p-2 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition flex items-center justify-center">
+                            <FiX size={16} />
+                        </button>
+                    </div>
+                )}
                 <form onSubmit={handleSend} className="flex gap-2 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 bg-white/30 sm:rounded-b-3xl rounded-b-xl border-t border-white/30 shadow-inner">
+                    {/* Image Picker Icon */}
+                    <label htmlFor="image-upload" className="flex items-center cursor-pointer text-blue-500 hover:text-purple-500 transition-colors">
+                        <FiImage size={24} />
+                        <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImagePick}
+                            disabled={!userId}
+                        />
+                    </label>
                     <input
                         ref={inputRef}
                         autoFocus
