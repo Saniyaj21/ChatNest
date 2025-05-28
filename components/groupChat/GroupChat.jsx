@@ -63,21 +63,27 @@ const GroupChat = (props) => {
         const onGroupMessage = (msg) => {
             console.log('Received group message:', msg);
             setMessages((prev) => [...prev, msg]);
+            // Remove typing indicator when message is received
             setTypingUsers((prev) => prev.filter((u) => u.userId !== msg.userId));
         };
 
         const onGroupTyping = (typingData) => {
-            setTypingUsers((prev) => {
-                // Remove if already present
-                const filtered = prev.filter((u) => u.userId !== typingData.userId);
-                if (typingData.isTyping) {
-                    return [...filtered, typingData];
-                } else {
-                    return filtered;
-                }
-            });
+            console.log('Received typing event:', typingData);
+            // Only update typing users if the event is for this group
+            if (typingData.groupId === group._id) {
+                setTypingUsers((prev) => {
+                    // Remove if already present
+                    const filtered = prev.filter((u) => u.userId !== typingData.userId);
+                    if (typingData.isTyping) {
+                        return [...filtered, typingData];
+                    } else {
+                        return filtered;
+                    }
+                });
+            }
         };
 
+        // Listen for group-specific events
         socket.on(`groupMessage:${group._id}`, onGroupMessage);
         socket.on(`groupTyping:${group._id}`, onGroupTyping);
 
