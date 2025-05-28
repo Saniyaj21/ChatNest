@@ -7,13 +7,15 @@ import MessageBubble from '../messageUI/MessageBubble';
 import TypingIndicator from '../messageUI/TypingIndicator';
 import { IoSendSharp } from "react-icons/io5";
 import { FiImage, FiX } from "react-icons/fi";
-import { FaUsers } from 'react-icons/fa';
+import { FaUsers, FaEllipsisV } from 'react-icons/fa';
+import GroupSidebar from './GroupSidebar';
 
 const GroupChat = (props) => {
     const { group, onBack } = props;
     const { user } = useUser();
     const userId = user?.id;
     const [userProfile, setUserProfile] = useState(null);
+    const [showGroupSidebar, setShowGroupSidebar] = useState(false);
     const userName = userProfile?.userName || user?.fullName || 'Anonymous';
     const userAvatar = userProfile?.userAvatar || user?.imageUrl || 'https://ui-avatars.com/api/?name=User';
     const [messages, setMessages] = useState([]);
@@ -97,7 +99,9 @@ const GroupChat = (props) => {
 
     useEffect(() => {
         // Scroll to bottom when messages change
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messages.length > 0) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
     }, [messages]);
 
     useEffect(() => {
@@ -222,9 +226,13 @@ const GroupChat = (props) => {
         setUploadedImagePublicId(null);
     };
 
+    const toggleGroupSidebar = () => {
+        setShowGroupSidebar(prev => !prev);
+    };
+
     return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 shadow-2xl backdrop-blur-lg border border-white/40 sm:p-0 p-1">
-            <div className="w-full max-w-2xl flex flex-col h-full sm:overflow-hidden overflow-visible">
+            <div className="w-full max-w-4xl flex flex-col h-full">
                 {/* Header */}
                 <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-6 py-2 sm:py-4 border-b border-white/30 bg-white/30 backdrop-blur-md shadow-sm overflow-hidden">
                     <div className="flex items-center gap-2 sm:gap-3">
@@ -233,30 +241,44 @@ const GroupChat = (props) => {
                             <button onClick={onBack} className="focus:outline-none p-1" aria-label="Back to sidebar">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                             </button>
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
                                 <FaUsers className="text-purple-600 text-lg" />
                             </div>
-                            <span className="flex items-center h-8">
-                                <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
-                                    {group.name}
-                                </h2>
-                            </span>
+                            <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
+                                {group.name}
+                            </h2>
                         </div>
                         {/* Desktop: original header */}
-                        <div className="hidden sm:flex items-center gap-3">
-                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white">
-                                <FaUsers className="text-purple-600 text-xl" />
-                            </div>
-                            <span className="flex items-center h-9">
-                                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
+                        <div className="hidden sm:block">
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
+                                    <FaUsers className="text-purple-600 text-xl" />
+                                </div>
+                                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
                                     {group.name}
                                 </h2>
-                            </span>
+                            </div>
                         </div>
                     </div>
+                    {/* Group Menu Button */}
+                    <button 
+                        onClick={toggleGroupSidebar}
+                        className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        aria-label="Group menu"
+                    >
+                        <FaEllipsisV className="text-xl" />
+                    </button>
                     {/* Glowing effect */}
                     <div className="absolute -top-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-blue-400/30 via-purple-400/20 to-pink-400/10 rounded-full blur-2xl pointer-events-none animate-pulse-slow"></div>
                 </div>
+
+                {/* Group Sidebar */}
+                <GroupSidebar 
+                    isOpen={showGroupSidebar}
+                    onClose={toggleGroupSidebar}
+                    group={group}
+                />
+
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-2 sm:py-3 space-y-2 bg-white/40 backdrop-blur-md sm:rounded-b-3xl rounded-b-xl scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent transition-all duration-300">
                     <div className="pt-4 flex flex-col justify-end min-h-full">
@@ -276,6 +298,7 @@ const GroupChat = (props) => {
                         <div ref={messagesEndRef} />
                     </div>
                 </div>
+
                 {/* Image Preview */}
                 {(imagePreview || imageUploading) && (
                     <div className="flex items-center gap-2 px-2 pb-2">
@@ -299,6 +322,7 @@ const GroupChat = (props) => {
                         )}
                     </div>
                 )}
+
                 {/* Input */}
                 <form onSubmit={handleSend} className="flex gap-2 sm:gap-3 px-2 sm:px-6 py-2 sm:py-4 bg-white/30 sm:rounded-b-3xl rounded-b-xl border-t border-white/30 shadow-inner">
                     {/* Image Picker Icon - only show if no image is selected or uploading */}
