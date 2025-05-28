@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
-import { FaSearch, FaUsers, FaGlobe, FaRobot, FaPlus, FaEllipsisV } from 'react-icons/fa';
+import { FaSearch, FaUsers, FaGlobe, FaRobot, FaPlus, FaEllipsisV, FaEnvelopeOpenText } from 'react-icons/fa';
 import SidebarMenu from './SidebarMenu';
 
 const fixedChats = [
@@ -130,6 +130,14 @@ const Sidebar = ({
               type="button"
             >
               <FaPlus size={14} />
+            </Link>
+            <Link
+              href="/group-invites"
+              className="ml-2 flex items-center justify-center w-7 h-7 rounded-full bg-blue-200 hover:bg-blue-400 text-blue-700 hover:text-white transition-colors shadow"
+              aria-label="View group invites"
+              type="button"
+            >
+              <FaEnvelopeOpenText size={14} />
             </Link>
           </h2>
           <ul className="space-y-1">
