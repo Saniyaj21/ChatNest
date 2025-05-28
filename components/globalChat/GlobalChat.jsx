@@ -34,7 +34,10 @@ const GlobalChat = (props) => {
     useEffect(() => {
         fetch(`${backendURL}/api/global-messages`)
             .then(res => res.json())
-            .then(data => setMessages(data))
+            .then(data => {
+                console.log('Fetched global messages:', data);
+                setMessages(data);
+            })
             .catch(err => console.error('Failed to load global messages:', err));
     }, []);
 
@@ -45,6 +48,7 @@ const GlobalChat = (props) => {
                 .then(res => res.json())
                 .then(data => {
                     if (data.user) {
+                        console.log('Fetched user profile:', data.user);
                         setUserProfile(data.user);
                     }
                 })
@@ -60,6 +64,7 @@ const GlobalChat = (props) => {
         };
         const onDisconnect = () => console.log('Socket disconnected');
         const onGlobalMessage = (msg) => {
+            console.log('Received global message:', msg);
             setMessages((prev) => [...prev, msg]);
             setTypingUsers((prev) => prev.filter((u) => u.userId !== msg.userId));
         };
@@ -116,19 +121,28 @@ const GlobalChat = (props) => {
     const handleInputChange = (e) => {
         setInput(e.target.value);
         if (!userId) return;
-        socket.emit('typing', { userId, userName, userAvatar, isTyping: true });
+        socket.emit('typing', { 
+            userId, 
+            userName, 
+            userAvatar, 
+            isTyping: true 
+        });
         clearTimeout(typingTimeout.current);
         typingTimeout.current = setTimeout(() => {
-            socket.emit('typing', { userId, userName, userAvatar, isTyping: false });
+            socket.emit('typing', { 
+                userId, 
+                userName, 
+                userAvatar, 
+                isTyping: false 
+            });
         }, 1200);
     };
 
     const handleSend = (e) => {
         e.preventDefault();
         if (!userId) return;
-        console.log('Sending message:', { input, uploadedImageUrl, uploadedImagePublicId });
         if ((input.trim() !== '' || uploadedImageUrl) && userId) {
-            socket.emit('globalMessage', {
+            const messageData = {
                 text: input,
                 userId,
                 userName,
@@ -136,13 +150,20 @@ const GlobalChat = (props) => {
                 timestamp: new Date().toISOString(),
                 image: uploadedImageUrl,
                 imagePublicId: uploadedImagePublicId
-            });
+            };
+            console.log('Sending message with data:', messageData);
+            socket.emit('globalMessage', messageData);
             setInput('');
             setImageFile(null);
             setImagePreview(null);
             setUploadedImagePublicId(null);
             setUploadedImageUrl(null);
-            socket.emit('typing', { userId, userName, userAvatar, isTyping: false });
+            socket.emit('typing', { 
+                userId, 
+                userName, 
+                userAvatar, 
+                isTyping: false 
+            });
             // Focus input after sending message
             setTimeout(() => {
                 inputRef.current?.focus();
@@ -153,6 +174,7 @@ const GlobalChat = (props) => {
     const handleImagePick = async (e) => {
         const file = e.target.files[0];
         if (file) {
+            console.log('Selected file:', file);
             setImageFile(file);
             setImagePreview(null);
             setUploadedImageUrl(null);
@@ -161,6 +183,7 @@ const GlobalChat = (props) => {
             const formData = new FormData();
             formData.append('image', file);
             try {
+                console.log('Uploading image to Cloudinary...');
                 const res = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData,
@@ -171,13 +194,14 @@ const GlobalChat = (props) => {
                     setUploadedImageUrl(data.url);
                     if (data.public_id) setUploadedImagePublicId(data.public_id);
                     setImagePreview(data.url);
-                    console.log('Image uploaded:', { url: data.url, public_id: data.public_id });
+                    console.log('Image uploaded successfully:', { url: data.url, public_id: data.public_id });
                 } else {
+                    console.error('Upload failed:', data.error);
                     alert(data.error || 'Image upload failed');
                 }
             } catch (err) {
-                alert('Image upload failed');
                 console.error('Image upload error:', err);
+                alert('Image upload failed');
             } finally {
                 setImageUploading(false);
             }
@@ -185,12 +209,9 @@ const GlobalChat = (props) => {
     };
 
     const handleRemoveImage = async () => {
-        // If uploadedImagePublicId exists, try to delete from Cloudinary
         if (uploadedImagePublicId) {
             setImagePreview(null);
-            // setImageUploading(true);
             try {
-                console.log('Deleting image with public_id:', uploadedImagePublicId);
                 const res = await fetch('/api/delete-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -199,10 +220,8 @@ const GlobalChat = (props) => {
                 const data = await res.json();
                 console.log('Delete response:', data);
             } catch (err) {
-                // Optionally show error
                 console.error('Image delete error:', err);
             }
-            // setImageUploading(false);
         }
         setImageFile(null);
         setUploadedImageUrl(null);
@@ -248,7 +267,7 @@ const GlobalChat = (props) => {
                                 userAvatar={msg.userAvatar}
                                 userName={msg.userName}
                                 timestamp={msg.timestamp}
-                                text={msg.text || msg.message}
+                                text={msg.text}
                                 image={msg.image}
                                 onImageLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
                             />
