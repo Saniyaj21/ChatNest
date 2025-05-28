@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
-import { FaSearch, FaUsers, FaGlobe, FaRobot, FaPlus } from 'react-icons/fa';
+import { FaSearch, FaUsers, FaGlobe, FaRobot, FaPlus, FaEllipsisV } from 'react-icons/fa';
+import SidebarMenu from './SidebarMenu';
 
 const fixedChats = [
   { id: 'global', name: 'Global Chat', icon: FaGlobe, iconColor: 'text-blue-500' },
@@ -18,6 +19,20 @@ const Sidebar = ({
   onClose
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuBtnRef = React.useRef(null);
+
+  // Close menu on outside click
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e) {
+      if (!e.target.closest('.sidebar-menu-popup') && !e.target.closest('.sidebar-menu-btn')) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [menuOpen]);
 
   // Filter chats based on search query
   const filteredData = useMemo(() => {
@@ -36,16 +51,38 @@ const Sidebar = ({
   return (
     <aside className="w-full h-full flex flex-col bg-blue-100 backdrop-blur-md">
       {/* Fixed Header Section */}
-      <div className="sticky top-0 z-20 bg-blue-100/95 backdrop-blur-md">
+      <div className="sticky top-0 z-20 bg-blue-100/95 backdrop-blur-md overflow-visible">
         {/* Logo Header */}
-        <div className="flex items-center px-6 py-5 border-b border-white/30 bg-white/30 backdrop-blur-md">
+        <div className="flex items-center px-6 py-5 border-b border-white/30 bg-white/30 backdrop-blur-md relative">
           <div className="flex items-center gap-3">
             <img src="/chatnest-logo.png" alt="ChatNest Logo" className="h-8 w-8 object-contain" />
             <span className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
               ChatNest
             </span>
           </div>
+          {/* 3-dot menu button */}
+          <button
+            ref={menuBtnRef}
+            className="sidebar-menu-btn ml-auto p-2 rounded-full hover:bg-blue-200 transition flex items-center justify-center text-gray-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            style={{ marginLeft: 'auto' }}
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Open menu"
+            type="button"
+          >
+            <FaEllipsisV size={20} />
+          </button>
+          <SidebarMenu
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            anchorRef={menuBtnRef}
+            onProfile={() => {/* handle profile click */}}
+            onSettings={() => {/* handle settings click */}}
+          />
         </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
         {/* Search Bar */}
         <div className="px-6 py-3 bg-white/40 backdrop-blur-md border-b border-white/20">
           <div className="flex items-center gap-2 bg-white/70 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400 transition">
@@ -59,10 +96,7 @@ const Sidebar = ({
             />
           </div>
         </div>
-      </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
         {/* Fixed Chats */}
         <div className="px-6 pt-4 pb-2 space-y-2">
           {filteredData.fixedChats.map(chat => {
