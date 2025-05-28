@@ -12,8 +12,9 @@ import { FiImage, FiX } from "react-icons/fi";
 const GlobalChat = (props) => {
     const { user } = useUser();
     const userId = user?.id;
-    const userName = user?.fullName || 'Anonymous';
-    const userAvatar = user?.imageUrl || 'https://ui-avatars.com/api/?name=User';
+    const [userProfile, setUserProfile] = useState(null);
+    const userName = userProfile?.userName || user?.fullName || 'Anonymous';
+    const userAvatar = userProfile?.userAvatar || user?.imageUrl || 'https://ui-avatars.com/api/?name=User';
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
@@ -36,6 +37,20 @@ const GlobalChat = (props) => {
             .then(data => setMessages(data))
             .catch(err => console.error('Failed to load global messages:', err));
     }, []);
+
+    // Fetch user profile
+    useEffect(() => {
+        if (userId) {
+            fetch(`${backendURL}/api/user/profile?userId=${userId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.user) {
+                        setUserProfile(data.user);
+                    }
+                })
+                .catch(err => console.error('Failed to load user profile:', err));
+        }
+    }, [userId]);
 
     useEffect(() => {
         const onConnect = () => {
