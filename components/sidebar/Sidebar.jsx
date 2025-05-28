@@ -143,7 +143,7 @@ const Sidebar = ({
           <ul className="space-y-1">
             {filteredData.groups.map(group => (
               <li
-                key={group.id}
+                key={group._id}
                 className="flex items-center gap-3 rounded-xl px-3 py-2 bg-white/60 hover:bg-purple-100/80 transition cursor-pointer"
                 onClick={() => onGroupClick && onGroupClick(group)}
               >

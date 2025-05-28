@@ -1,7 +1,9 @@
 import React from 'react';
+import { FaUsers } from 'react-icons/fa';
 
 const GroupChat = (props) => {
   const { group, onBack } = props;
+  console.log(group);
   if (!group) return null;
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 shadow-2xl backdrop-blur-lg border border-white/40 sm:p-0 p-1">
@@ -14,19 +16,25 @@ const GroupChat = (props) => {
               <button onClick={onBack} className="focus:outline-none p-1" aria-label="Back to sidebar">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </button>
-              <img src="/chatnest-logo.png" alt="ChatNest Logo" className="h-7 w-7 object-contain" />
-              <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
-                <span>👥</span> {group.name}
-              </h2>
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white">
+                <FaUsers className="text-purple-600 text-lg" />
+              </div>
+              <span className="flex items-center h-8">
+                <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
+                  {group.name}
+                </h2>
+              </span>
             </div>
             {/* Desktop: original header */}
-            <div className="hidden sm:block">
-              <div className="flex items-center gap-2">
-                <img src="/chatnest-logo.png" alt="ChatNest Logo" className="h-8 w-8 object-contain" />
-                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
-                  <span>👥</span> {group.name}
-                </h2>
+            <div className="hidden sm:flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white">
+                <FaUsers className="text-purple-600 text-xl" />
               </div>
+              <span className="flex items-center h-9">
+                <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow flex items-center gap-2">
+                  {group.name}
+                </h2>
+              </span>
             </div>
           </div>
           {/* Glowing effect */}
