@@ -29,6 +29,7 @@ const GroupChat = (props) => {
     const [imageUploading, setImageUploading] = useState(false);
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const [uploadedImagePublicId, setUploadedImagePublicId] = useState(null);
+    const [activeGroupUsers, setActiveGroupUsers] = useState([]);
 
     if (!group) return null;
 
@@ -59,8 +60,28 @@ const GroupChat = (props) => {
     }, [userId]);
 
     useEffect(() => {
-        // Join the group room
-        socket.emit('joinGroup', group._id);
+        // Emit setUser for disconnect cleanup
+        if (userId) {
+            socket.emit('setUser', {
+                userId,
+                userName,
+                userAvatar,
+            });
+        }
+    }, [userId, userName, userAvatar]);
+
+    useEffect(() => {
+        // Join the group room with user info
+        if (userId) {
+            socket.emit('joinGroup', {
+                groupId: group._id,
+                user: {
+                    userId,
+                    userName,
+                    userAvatar,
+                },
+            });
+        }
 
         const onGroupMessage = (msg) => {
             console.log('Received group message:', msg);
@@ -88,14 +109,28 @@ const GroupChat = (props) => {
         // Listen for group-specific events
         socket.on(`groupMessage:${group._id}`, onGroupMessage);
         socket.on(`groupTyping:${group._id}`, onGroupTyping);
-
+        // Listen for active users in group
+        const onGroupActiveUsers = (users) => {
+            setActiveGroupUsers(users);
+        };
+        socket.on('groupActiveUsers', onGroupActiveUsers);
         // Clean up on unmount
         return () => {
             socket.off(`groupMessage:${group._id}`, onGroupMessage);
             socket.off(`groupTyping:${group._id}`, onGroupTyping);
-            socket.emit('leaveGroup', group._id);
+            socket.off('groupActiveUsers', onGroupActiveUsers);
+            if (userId) {
+                socket.emit('leaveGroup', {
+                    groupId: group._id,
+                    user: {
+                        userId,
+                        userName,
+                        userAvatar,
+                    },
+                });
+            }
         };
-    }, [group._id]);
+    }, [group._id, userId, userName, userAvatar]);
 
     useEffect(() => {
         // Scroll to bottom when messages change
@@ -234,9 +269,9 @@ const GroupChat = (props) => {
         <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 shadow-2xl backdrop-blur-lg border border-white/40 sm:p-0 p-1">
             <div className="w-full max-w-4xl flex flex-col h-full">
                 {/* Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-6 py-2 sm:py-4 border-b border-white/30 bg-white/30 backdrop-blur-md shadow-sm overflow-hidden">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        {/* Mobile: back arrow and title */}
+                <div className="sticky top-0 z-10 flex flex-col px-3 sm:px-6 py-2 sm:py-4 border-b border-white/30 bg-white/30 backdrop-blur-md shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between">
+                        {/* MOBILE HEADER */}
                         <div className="flex items-center gap-2 sm:hidden">
                             <button onClick={onBack} className="focus:outline-none p-1" aria-label="Back to sidebar">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -244,32 +279,96 @@ const GroupChat = (props) => {
                             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
                                 <FaUsers className="text-purple-600 text-lg" />
                             </div>
-                            <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
-                                {group.name}
-                            </h2>
-                        </div>
-                        {/* Desktop: original header */}
-                        <div className="hidden sm:block">
-                            <div className="flex items-center gap-2">
-                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
-                                    <FaUsers className="text-purple-600 text-xl" />
+                            <div className="flex flex-col items-start">
+                                <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
+                                    {group.name}
+                                </h2>
+                                <div className="flex items-center gap-1 mt-1">
+                                    {activeGroupUsers.slice(0, 5).map((u, idx) => (
+                                        <span
+                                            key={u.userId}
+                                            className="relative"
+                                            style={{
+                                                zIndex: 10 - idx,
+                                                marginLeft: idx === 0 ? 0 : -6,
+                                            }}
+                                            title={u.userName || u.userId}
+                                        >
+                                            <img
+                                                src={u.userAvatar}
+                                                alt={u.userName || u.userId}
+                                                className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-white shadow object-cover"
+                                                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+                                            />
+                                            {/* Green online indicator */}
+                                            <span className="absolute bottom-0 right-0 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 border-2 border-white rounded-full"></span>
+                                        </span>
+                                    ))}
+                                    {activeGroupUsers.length > 5 && (
+                                        <span
+                                            className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200 border flex items-center justify-center text-[10px] sm:text-xs font-semibold text-gray-600 shadow"
+                                            style={{ marginLeft: -6, zIndex: 4 }}
+                                            title={`${activeGroupUsers.length - 5} more`}
+                                        >
+                                            +{activeGroupUsers.length - 5}
+                                        </span>
+                                    )}
                                 </div>
+                            </div>
+                        </div>
+                        {/* DESKTOP HEADER */}
+                        <div className="hidden sm:flex items-center gap-2">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
+                                <FaUsers className="text-purple-600 text-xl" />
+                            </div>
+                            <div className="flex flex-col items-start">
                                 <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
                                     {group.name}
                                 </h2>
+                                <div className="flex items-center gap-1 mt-1">
+                                    {activeGroupUsers.slice(0, 5).map((u, idx) => (
+                                        <span
+                                            key={u.userId}
+                                            className="relative"
+                                            style={{
+                                                zIndex: 10 - idx,
+                                                marginLeft: idx === 0 ? 0 : -6,
+                                            }}
+                                            title={u.userName || u.userId}
+                                        >
+                                            <img
+                                                src={u.userAvatar}
+                                                alt={u.userName || u.userId}
+                                                className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-white shadow object-cover"
+                                                style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+                                            />
+                                            {/* Green online indicator */}
+                                            <span className="absolute bottom-0 right-0 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 border-2 border-white rounded-full"></span>
+                                        </span>
+                                    ))}
+                                    {activeGroupUsers.length > 5 && (
+                                        <span
+                                            className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-gray-200 border flex items-center justify-center text-[10px] sm:text-xs font-semibold text-gray-600 shadow"
+                                            style={{ marginLeft: -6, zIndex: 4 }}
+                                            title={`${activeGroupUsers.length - 5} more`}
+                                        >
+                                            +{activeGroupUsers.length - 5}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                         </div>
+                        {/* Group Menu Button */}
+                        <button 
+                            onClick={toggleGroupSidebar}
+                            className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            aria-label="Group menu"
+                        >
+                            <FaEllipsisV className="text-xl" />
+                        </button>
+                        {/* Glowing effect */}
+                        <div className="absolute -top-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-blue-400/30 via-purple-400/20 to-pink-400/10 rounded-full blur-2xl pointer-events-none animate-pulse-slow"></div>
                     </div>
-                    {/* Group Menu Button */}
-                    <button 
-                        onClick={toggleGroupSidebar}
-                        className="p-2 text-gray-600 hover:text-blue-600 transition-colors rounded-full hover:bg-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        aria-label="Group menu"
-                    >
-                        <FaEllipsisV className="text-xl" />
-                    </button>
-                    {/* Glowing effect */}
-                    <div className="absolute -top-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-gradient-to-br from-blue-400/30 via-purple-400/20 to-pink-400/10 rounded-full blur-2xl pointer-events-none animate-pulse-slow"></div>
                 </div>
 
                 {/* Group Sidebar */}
