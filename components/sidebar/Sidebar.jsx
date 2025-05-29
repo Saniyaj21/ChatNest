@@ -1,10 +1,13 @@
 'use client'
 
 import Link from 'next/link';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FaSearch, FaUsers, FaGlobe, FaRobot, FaPlus, FaEllipsisV, FaEnvelopeOpenText } from 'react-icons/fa';
 import { FiImage } from 'react-icons/fi';
 import SidebarMenu from './SidebarMenu';
+import socket from '@/lib/socket';
+import { useUser } from '@clerk/nextjs';
+import { backendURL } from '@/lib/socket';
 
 const fixedChats = [
   { id: 'global', name: 'Global Chat', icon: FaGlobe, iconColor: 'text-blue-500' },
@@ -22,6 +25,8 @@ const Sidebar = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const menuBtnRef = React.useRef(null);
+  const { user } = useUser();
+  const [pendingInvites, setPendingInvites] = useState(0);
 
   // Close menu on outside click
   React.useEffect(() => {
@@ -48,6 +53,33 @@ const Sidebar = ({
       )
     };
   }, [searchQuery]);
+
+  const fetchPendingInvites = async () => {
+    if (!user) return;
+    try {
+      const res = await fetch(`${backendURL}/api/groups/invites?userId=${user.id}`);
+      const data = await res.json();
+      if (res.ok) {
+        setPendingInvites(data.invites?.length || 0);
+      }
+    } catch (err) {
+      setPendingInvites(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingInvites();
+  }, [user]);
+
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchPendingInvites();
+    };
+    socket.on('refreshGroupsSidebar', handleRefresh);
+    return () => {
+      socket.off('refreshGroupsSidebar', handleRefresh);
+    };
+  }, [user]);
 
   return (
     <aside className="w-full h-full flex flex-col bg-blue-100 backdrop-blur-md">
@@ -133,11 +165,14 @@ const Sidebar = ({
             </Link>
             <Link
               href="/group-invites"
-              className="ml-2 flex items-center justify-center w-7 h-7 rounded-full bg-blue-200 hover:bg-blue-400 text-blue-700 hover:text-white transition-colors shadow"
+              className="ml-2 flex items-center justify-center w-7 h-7 rounded-full bg-blue-200 hover:bg-blue-400 text-blue-700 hover:text-white transition-colors shadow relative"
               aria-label="View group invites"
               type="button"
             >
               <FaEnvelopeOpenText size={14} />
+              {pendingInvites > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[18px] text-center font-bold border border-white shadow">{pendingInvites}</span>
+              )}
             </Link>
           </h2>
           <ul className="space-y-1">

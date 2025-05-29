@@ -4,6 +4,7 @@ import Header from '../../components/ui/Header';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { backendURL } from '@/lib/socket';
+import socket from '@/lib/socket';
 
 export default function CreateGroupPage() {
   const [groupName, setGroupName] = useState('');
@@ -70,6 +71,7 @@ export default function CreateGroupPage() {
       const data = await res.json();
       if (res.ok) {
         setSubmitSuccess(true);
+        socket.emit('groupCreated', { group: data.group });
         setTimeout(() => router.push('/'), 1500);
       } else {
         setSubmitError(data.error || 'Failed to create group');
