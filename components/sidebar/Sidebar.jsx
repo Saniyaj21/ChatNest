@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FaSearch, FaUsers, FaGlobe, FaRobot, FaPlus, FaEllipsisV, FaEnvelopeOpenText } from 'react-icons/fa';
+import { FiImage } from 'react-icons/fi';
 import SidebarMenu from './SidebarMenu';
 
 const fixedChats = [
@@ -152,7 +153,13 @@ const Sidebar = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="font-semibold text-gray-800 text-base truncate block">{group.name}</span>
-                  <span className="text-gray-500 text-xs truncate block">{group.lastMessage}</span>
+                  <span className="text-gray-500 text-xs truncate block flex items-center gap-1">
+                    {group.lastMessage
+                      ? (group.lastMessage === 'image'
+                          ? <><FiImage className="inline-block align-text-bottom" /> Image</>
+                          : group.lastMessage)
+                      : 'No messages yet'}
+                  </span>
                 </div>
               </li>
             ))}

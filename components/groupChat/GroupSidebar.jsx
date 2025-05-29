@@ -2,11 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { FaUsers } from 'react-icons/fa';
 import { FiX } from 'react-icons/fi';
 import { backendURL } from '@/lib/socket';
+import { useRouter } from 'next/navigation';
 
-const GroupSidebar = ({ isOpen, onClose, group }) => {
+const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState('');
+    const [showConfirm, setShowConfirm] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchMembers = async () => {
@@ -122,6 +127,60 @@ const GroupSidebar = ({ isOpen, onClose, group }) => {
                             <div className="space-y-2">
                                 {/* Add settings options here */}
                                 <p className="text-gray-500 text-sm">Settings options will be added here</p>
+                                <button
+                                    className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50"
+                                    disabled={deleting}
+                                    onClick={() => setShowConfirm(true)}
+                                >
+                                    {deleting ? 'Deleting...' : 'Delete Group'}
+                                </button>
+                                {deleteError && <p className="text-red-500 text-sm mt-1">{deleteError}</p>}
+                                {/* Custom Confirm Modal */}
+                                {showConfirm && (
+                                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                                        <div className="bg-white rounded-xl shadow-lg p-6 max-w-xs w-full">
+                                            <h3 className="text-lg font-bold mb-2 text-gray-800">Delete Group?</h3>
+                                            <p className="text-gray-600 mb-4">Are you sure you want to delete this group? This action cannot be undone.</p>
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    className="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                                    onClick={() => setShowConfirm(false)}
+                                                    disabled={deleting}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 font-semibold disabled:opacity-50"
+                                                    disabled={deleting}
+                                                    onClick={async () => {
+                                                        setDeleting(true);
+                                                        setDeleteError('');
+                                                        try {
+                                                            const res = await fetch(`${backendURL}/api/groups/${group._id}`, {
+                                                                method: 'DELETE',
+                                                            });
+                                                            if (res.ok) {
+                                                                setShowConfirm(false);
+                                                                onClose && onClose();
+                                                                onGroupDeleted && onGroupDeleted(group._id);
+                                                            } else {
+                                                                const data = await res.json();
+                                                                setDeleteError(data.error || 'Failed to delete group');
+                                                            }
+                                                        } catch (err) {
+                                                            setDeleteError('Network error');
+                                                        } finally {
+                                                            setDeleting(false);
+                                                        }
+                                                    }}
+                                                >
+                                                    {deleting ? 'Deleting...' : 'Yes, Delete'}
+                                                </button>
+                                            </div>
+                                            {deleteError && <p className="text-red-500 text-sm mt-2">{deleteError}</p>}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

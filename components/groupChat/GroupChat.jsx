@@ -11,7 +11,7 @@ import { FaUsers, FaEllipsisV } from 'react-icons/fa';
 import GroupSidebar from './GroupSidebar';
 
 const GroupChat = (props) => {
-    const { group, onBack } = props;
+    const { group, onBack, onGroupDeleted } = props;
     const { user } = useUser();
     const userId = user?.id;
     const [userProfile, setUserProfile] = useState(null);
@@ -277,6 +277,7 @@ const GroupChat = (props) => {
                     isOpen={showGroupSidebar}
                     onClose={toggleGroupSidebar}
                     group={group}
+                    onGroupDeleted={onGroupDeleted}
                 />
 
                 {/* Messages */}

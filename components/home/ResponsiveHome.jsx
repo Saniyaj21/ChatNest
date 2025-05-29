@@ -21,23 +21,23 @@ const ResponsiveHome = () => {
       setSelectedChat('global');
     }
   }, []);
-
+  const fetchGroups = async () => {
+    if (!user) return;
+    setGroupsLoading(true);
+    try {
+      const res = await axios.get(`${backendURL}/api/groups/accepted`, {
+        params: { userId: user.id },
+      });
+      setGroups(res.data.groups || []);
+    } catch (err) {
+      setGroups([]);
+    } finally {
+      setGroupsLoading(false);
+    }
+  };
   // Fetch accepted groups for the user
   useEffect(() => {
-    const fetchGroups = async () => {
-      if (!user) return;
-      setGroupsLoading(true);
-      try {
-        const res = await axios.get(`${backendURL}/api/groups/accepted`, {
-          params: { userId: user.id },
-        });
-        setGroups(res.data.groups || []);
-      } catch (err) {
-        setGroups([]);
-      } finally {
-        setGroupsLoading(false);
-      }
-    };
+    
     fetchGroups();
   }, [user]);
 
@@ -56,6 +56,13 @@ const ResponsiveHome = () => {
   };
   const handleBackToSidebar = () => {
     setSelectedChat(null);
+  };
+
+  // Handler for group deletion
+  const handleGroupDeleted = (deletedGroupId) => {
+    console.log('Group deleted:', deletedGroupId);
+    fetchGroups();
+    setSelectedChat('global');
   };
 
   return (
@@ -104,7 +111,7 @@ const ResponsiveHome = () => {
             <div className="w-full h-full">
               {selectedChat === 'global' && <GlobalChat onBack={handleBackToSidebar} />}
               {selectedChat === 'ai' && <AIChat onBack={handleBackToSidebar} />}
-              {selectedChat && selectedChat._id && <GroupChat group={selectedChat} onBack={handleBackToSidebar} />}
+              {selectedChat && selectedChat._id && <GroupChat group={selectedChat} onBack={handleBackToSidebar} onGroupDeleted={handleGroupDeleted} />}
             </div>
           )}
         </div>
