@@ -14,7 +14,7 @@ const MessageBubble = ({ isOwn, userAvatar, userName, timestamp, text, image, on
             <span className="font-bold text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[120px]">{userName || 'User'}</span>
           )}
           <span className={`font-mono text-[9px] sm:text-[10px] ${isOwn ? 'text-blue-100 font-semibold' : 'text-gray-400'}`}>
-            {timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+            {timestamp ? `${new Date(timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}, ${new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
           </span>
         </div>
         <span className="leading-snug break-words">{text}</span>
