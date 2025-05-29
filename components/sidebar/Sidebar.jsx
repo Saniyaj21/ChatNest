@@ -127,7 +127,6 @@ const Sidebar = ({
               href="/create-group"
               className="ml-auto flex items-center justify-center w-7 h-7 rounded-full bg-purple-200 hover:bg-purple-400 text-purple-700 hover:text-white transition-colors shadow"
               aria-label="Create group"
-              onClick={() => console.log('Create group clicked')}
               type="button"
             >
               <FaPlus size={14} />
@@ -153,7 +152,7 @@ const Sidebar = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="font-semibold text-gray-800 text-base truncate block">{group.name}</span>
-                  <span className="text-gray-500 text-xs truncate block flex items-center gap-1">
+                  <span className="text-gray-500 text-xs truncate flex items-center gap-1">
                     {group.lastMessage
                       ? (group.lastMessage === 'image'
                           ? <><FiImage className="inline-block align-text-bottom" /> Image</>

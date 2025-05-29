@@ -38,7 +38,6 @@ const GroupChat = (props) => {
         fetch(`${backendURL}/api/group-messages?groupId=${group._id}`)
             .then(res => res.json())
             .then(data => {
-                console.log('Fetched group messages:', data);
                 setMessages(data);
             })
             .catch(err => console.error('Failed to load group messages:', err));
@@ -51,7 +50,6 @@ const GroupChat = (props) => {
                 .then(res => res.json())
                 .then(data => {
                     if (data.user) {
-                        console.log('Fetched user profile:', data.user);
                         setUserProfile(data.user);
                     }
                 })
@@ -84,14 +82,12 @@ const GroupChat = (props) => {
         }
 
         const onGroupMessage = (msg) => {
-            console.log('Received group message:', msg);
             setMessages((prev) => [...prev, msg]);
             // Remove typing indicator when message is received
             setTypingUsers((prev) => prev.filter((u) => u.userId !== msg.userId));
         };
 
         const onGroupTyping = (typingData) => {
-            console.log('Received typing event:', typingData);
             // Only update typing users if the event is for this group
             if (typingData.groupId === group._id) {
                 setTypingUsers((prev) => {
@@ -183,7 +179,6 @@ const GroupChat = (props) => {
                 image: uploadedImageUrl,
                 imagePublicId: uploadedImagePublicId
             };
-            console.log('Sending message with data:', messageData);
             socket.emit('groupMessage', messageData);
             setInput('');
             setImageFile(null);
@@ -207,7 +202,6 @@ const GroupChat = (props) => {
     const handleImagePick = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            console.log('Selected file:', file);
             setImageFile(file);
             setImagePreview(null);
             setUploadedImageUrl(null);
@@ -216,24 +210,19 @@ const GroupChat = (props) => {
             const formData = new FormData();
             formData.append('image', file);
             try {
-                console.log('Uploading image to Cloudinary...');
                 const res = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData,
                 });
                 const data = await res.json();
-                console.log('Upload response:', data);
                 if (res.ok && data.url) {
                     setUploadedImageUrl(data.url);
                     if (data.public_id) setUploadedImagePublicId(data.public_id);
                     setImagePreview(data.url);
-                    console.log('Image uploaded successfully:', { url: data.url, public_id: data.public_id });
                 } else {
-                    console.error('Upload failed:', data.error);
                     alert(data.error || 'Image upload failed');
                 }
             } catch (err) {
-                console.error('Image upload error:', err);
                 alert('Image upload failed');
             } finally {
                 setImageUploading(false);
@@ -250,8 +239,6 @@ const GroupChat = (props) => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ public_id: uploadedImagePublicId }),
                 });
-                const data = await res.json();
-                console.log('Delete response:', data);
             } catch (err) {
                 console.error('Image delete error:', err);
             }

@@ -36,9 +36,6 @@ export async function POST(req) {
             Current question:
             ${message}`;
 
-        console.log("Prompt sent to AI:", prompt);
-        console.log("Context sent to AI:", context);
-
         // Generate AI response
         let aiResponse = await generateAIResponse(prompt);
         if (!aiResponse) {

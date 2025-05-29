@@ -28,14 +28,11 @@ const GlobalChat = (props) => {
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const [uploadedImagePublicId, setUploadedImagePublicId] = useState(null);
 
-    console.log(activeUsers)
-
     // Load all previous global messages from the API
     useEffect(() => {
         fetch(`${backendURL}/api/global-messages`)
             .then(res => res.json())
             .then(data => {
-                console.log('Fetched global messages:', data);
                 setMessages(data);
             })
             .catch(err => console.error('Failed to load global messages:', err));
@@ -48,7 +45,6 @@ const GlobalChat = (props) => {
                 .then(res => res.json())
                 .then(data => {
                     if (data.user) {
-                        console.log('Fetched user profile:', data.user);
                         setUserProfile(data.user);
                     }
                 })
@@ -58,19 +54,15 @@ const GlobalChat = (props) => {
 
     useEffect(() => {
         const onConnect = () => {
-            console.log('Socket connected:', socket.id);
-            // Request initial active users count
             socket.emit('getActiveUsers');
         };
         const onDisconnect = () => console.log('Socket disconnected');
         const onGlobalMessage = (msg) => {
-            console.log('Received global message:', msg);
             setMessages((prev) => [...prev, msg]);
             setTypingUsers((prev) => prev.filter((u) => u.userId !== msg.userId));
         };
         const onActiveUsers = (count) => {
             setActiveUsers(count);
-            console.log(count)
         };
         const onTyping = (typingData) => {
             setTypingUsers((prev) => {
@@ -151,7 +143,6 @@ const GlobalChat = (props) => {
                 image: uploadedImageUrl,
                 imagePublicId: uploadedImagePublicId
             };
-            console.log('Sending message with data:', messageData);
             socket.emit('globalMessage', messageData);
             setInput('');
             setImageFile(null);
@@ -174,7 +165,6 @@ const GlobalChat = (props) => {
     const handleImagePick = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            console.log('Selected file:', file);
             setImageFile(file);
             setImagePreview(null);
             setUploadedImageUrl(null);
@@ -183,24 +173,19 @@ const GlobalChat = (props) => {
             const formData = new FormData();
             formData.append('image', file);
             try {
-                console.log('Uploading image to Cloudinary...');
                 const res = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData,
                 });
                 const data = await res.json();
-                console.log('Upload response:', data);
                 if (res.ok && data.url) {
                     setUploadedImageUrl(data.url);
                     if (data.public_id) setUploadedImagePublicId(data.public_id);
                     setImagePreview(data.url);
-                    console.log('Image uploaded successfully:', { url: data.url, public_id: data.public_id });
                 } else {
-                    console.error('Upload failed:', data.error);
                     alert(data.error || 'Image upload failed');
                 }
             } catch (err) {
-                console.error('Image upload error:', err);
                 alert('Image upload failed');
             } finally {
                 setImageUploading(false);
@@ -217,8 +202,6 @@ const GlobalChat = (props) => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ public_id: uploadedImagePublicId }),
                 });
-                const data = await res.json();
-                console.log('Delete response:', data);
             } catch (err) {
                 console.error('Image delete error:', err);
             }
@@ -251,7 +234,6 @@ const GlobalChat = (props) => {
                                 </h2>
                             </div>
                         </div>
-                        {/* <span className="text-[10px] sm:text-xs text-gray-600 font-medium italic ml-1">Connect with everyone, everywhere.</span> */}
                     </div>
                     <ActiveUsersIndicator count={activeUsers} />
                     {/* Glowing effect */}

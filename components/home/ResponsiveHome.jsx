@@ -60,7 +60,6 @@ const ResponsiveHome = () => {
 
   // Handler for group deletion
   const handleGroupDeleted = (deletedGroupId) => {
-    console.log('Group deleted:', deletedGroupId);
     fetchGroups();
     setSelectedChat('global');
   };

@@ -29,7 +29,6 @@ export default function CreateGroupPage() {
     try {
       const res = await fetch(`${backendURL}/api/user/search?email=${encodeURIComponent(value)}${user?.id ? `&excludeUserId=${user.id}` : ''}`);
       const data = await res.json();
-      console.log('Search results:', data);
       
       if (res.ok) {
         setSearchResults(data.users.filter(u => !selectedUsers.some(sel => sel.userEmail === u.userEmail)));

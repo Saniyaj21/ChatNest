@@ -22,7 +22,6 @@ const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
                 const res = await fetch(`${backendURL}/api/groups/${group._id}/members`);
                 const data = await res.json();
                 if (res.ok) {
-                    console.log(data);
                     setMembers(data.members || []);
                 } else {
                     setError(data.error || 'Failed to fetch members');

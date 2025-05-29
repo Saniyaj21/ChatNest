@@ -22,8 +22,6 @@ const page = () => {
     if (isSignedIn && user) {
       (async () => {
         try {
-          console.log('User is signed in:', user);
-          // Prepare profilePicture object as required by backend
           const profilePicture = {
             url: user.imageUrl || '',
             publicId: '', // Clerk does not provide a Cloudinary publicId by default
@@ -36,18 +34,12 @@ const page = () => {
             profilePicture,
             userEmail: user.primaryEmailAddress?.emailAddress || '',
           };
-          console.log('Sending user payload to backend:', payload);
           const res = await axios.post(`${backendURL}/api/user`, payload);
-          console.log('User API response status:', res.status);
-          console.log('User API response data:', res.data);
           if (res.status !== 200) {
-            console.error('User creation failed:', res.data);
           }
         } catch (err) {
           if (err.response) {
-            console.error('User API error response:', err.response.data);
           } else {
-            console.error('User API request error:', err);
           }
         }
       })();
