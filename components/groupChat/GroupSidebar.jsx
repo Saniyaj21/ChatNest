@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaUsers } from 'react-icons/fa';
-import { FiX } from 'react-icons/fi';
+import { FaUsers, FaCamera } from 'react-icons/fa';
+import { FiX, FiImage } from "react-icons/fi";
 import { backendURL } from '@/lib/socket';
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,8 @@ const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState('');
     const [showConfirm, setShowConfirm] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
+    const [currentGroupImage, setCurrentGroupImage] = useState(group?.imageUrl || null);
     const router = useRouter();
 
     useEffect(() => {
@@ -37,6 +39,51 @@ const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
             fetchMembers();
         }
     }, [group?._id, isOpen]);
+
+    const handleImagePick = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageUploading(true);
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+                if (res.ok && data.url) {
+                    console.log('Uploaded Image URL:', data.url);
+                    console.log('Public ID:', data.public_id);
+                    
+                    // Update group image in the database
+                    const updateRes = await fetch(`${backendURL}/api/groups/${group._id}/image`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            imageUrl: data.url,
+                            imagePublicId: data.public_id 
+                        }),
+                    });
+                    
+                    if (updateRes.ok) {
+                        setCurrentGroupImage(data.url);
+                        // Refresh the page to show new image
+                        router.refresh();
+                    } else {
+                        const errorData = await updateRes.json();
+                        alert(errorData.error || 'Failed to update group image');
+                    }
+                } else {
+                    alert(data.error || 'Image upload failed');
+                }
+            } catch (err) {
+                alert('Image upload failed');
+            } finally {
+                setImageUploading(false);
+            }
+        }
+    };
 
     if (!group) return null;
 
@@ -74,15 +121,44 @@ const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
                     
                     {/* Dialog Content */}
                     <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
-                        {/* Group Details */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-center w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border-4 border-white shadow-lg">
-                                <FaUsers className="text-purple-600 text-3xl" />
+                        {/* Group Image */}
+                        <div className="flex flex-col items-center gap-4 mb-6">
+                            <div className="relative group">
+                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border-4 border-white shadow-lg overflow-hidden">
+                                    {imageUploading ? (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <svg className="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                            </svg>
+                                        </div>
+                                    ) : currentGroupImage ? (
+                                        <img 
+                                            src={currentGroupImage} 
+                                            alt={group.name} 
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <FaUsers className="text-purple-600 text-4xl" />
+                                        </div>
+                                    )}
+                                </div>
+                                <label 
+                                    htmlFor="group-image-upload" 
+                                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                                >
+                                    <FaCamera className="text-white text-2xl" />
+                                </label>
+                                <input
+                                    id="group-image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImagePick}
+                                />
                             </div>
-                            <div className="text-center">
-                                <h4 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent">{group.name}</h4>
-                                <p className="text-gray-500 mt-1">Group Chat</p>
-                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800">{group.name}</h2>
                         </div>
 
                         {/* Group Members Section */}

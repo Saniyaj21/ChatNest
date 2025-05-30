@@ -29,6 +29,7 @@ const ResponsiveHome = () => {
         params: { userId: user.id },
       });
       setGroups(res.data.groups || []);
+      
     } catch (err) {
       setGroups([]);
     } finally {

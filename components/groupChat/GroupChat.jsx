@@ -263,8 +263,16 @@ const GroupChat = (props) => {
                             <button onClick={onBack} className="focus:outline-none p-1" aria-label="Back to sidebar">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                             </button>
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
-                                <FaUsers className="text-purple-600 text-lg" />
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md overflow-hidden">
+                                {group.imageUrl ? (
+                                    <img 
+                                        src={group.imageUrl} 
+                                        alt={group.name} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <FaUsers className="text-purple-600 text-lg" />
+                                )}
                             </div>
                             <div className="flex flex-col items-start">
                                 <h2 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">
@@ -305,8 +313,16 @@ const GroupChat = (props) => {
                         </div>
                         {/* DESKTOP HEADER */}
                         <div className="hidden sm:flex items-center gap-2">
-                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md">
-                                <FaUsers className="text-purple-600 text-xl" />
+                            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md overflow-hidden">
+                                {group.imageUrl ? (
+                                    <img 
+                                        src={group.imageUrl} 
+                                        alt={group.name} 
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <FaUsers className="text-purple-600 text-xl" />
+                                )}
                             </div>
                             <div className="flex flex-col items-start">
                                 <h2 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight drop-shadow-glow animate-glow">

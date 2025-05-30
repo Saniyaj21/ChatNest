@@ -182,8 +182,16 @@ const Sidebar = ({
                 className="flex items-center gap-3 rounded-xl px-3 py-2 bg-white/60 hover:bg-purple-100/80 transition cursor-pointer"
                 onClick={() => onGroupClick && onGroupClick(group)}
               >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 flex items-center justify-center border border-white">
-                  <FaUsers className="text-purple-600 text-lg" />
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 flex items-center justify-center border border-white overflow-hidden">
+                  {group.imageUrl ? (
+                    <img
+                      src={group.imageUrl}
+                      alt={group.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FaUsers className="text-purple-600 text-lg" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <span className="font-semibold text-gray-800 text-base truncate block">{group.name}</span>
