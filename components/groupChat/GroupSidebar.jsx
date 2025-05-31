@@ -4,7 +4,7 @@ import { FiX, FiImage } from "react-icons/fi";
 import { backendURL } from '@/lib/socket';
 import { useRouter } from 'next/navigation';
 
-const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
+const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted, onGroupImageChanged }) => {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -68,6 +68,10 @@ const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted }) => {
                     
                     if (updateRes.ok) {
                         setCurrentGroupImage(data.url);
+                        // Notify parent about image change, pass new image URL
+                        if (typeof onGroupImageChanged === 'function') {
+                            onGroupImageChanged(data.url);
+                        }
                         // Refresh the page to show new image
                         router.refresh();
                     } else {

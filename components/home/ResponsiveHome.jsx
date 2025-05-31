@@ -65,6 +65,11 @@ const ResponsiveHome = () => {
     setSelectedChat('global');
   };
 
+  // Handler for group image change
+  const handleGroupImageChanged = () => {
+    fetchGroups();
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">      {/* Sidebar for desktop */}      
       <div className="hidden md:block h-full w-[320px]">
@@ -111,7 +116,7 @@ const ResponsiveHome = () => {
             <div className="w-full h-full">
               {selectedChat === 'global' && <GlobalChat onBack={handleBackToSidebar} />}
               {selectedChat === 'ai' && <AIChat onBack={handleBackToSidebar} />}
-              {selectedChat && selectedChat._id && <GroupChat group={selectedChat} onBack={handleBackToSidebar} onGroupDeleted={handleGroupDeleted} />}
+              {selectedChat && selectedChat._id && <GroupChat group={selectedChat} onBack={handleBackToSidebar} onGroupDeleted={handleGroupDeleted} onGroupImageChanged={handleGroupImageChanged} />}
             </div>
           )}
         </div>

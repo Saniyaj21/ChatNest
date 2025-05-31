@@ -11,7 +11,7 @@ import { FaUsers, FaEllipsisV } from 'react-icons/fa';
 import GroupSidebar from './GroupSidebar';
 
 const GroupChat = (props) => {
-    const { group, onBack, onGroupDeleted } = props;
+    const { group, onBack, onGroupDeleted, onGroupImageChanged } = props;
     const { user } = useUser();
     const userId = user?.id;
     const [userProfile, setUserProfile] = useState(null);
@@ -30,6 +30,7 @@ const GroupChat = (props) => {
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
     const [uploadedImagePublicId, setUploadedImagePublicId] = useState(null);
     const [activeGroupUsers, setActiveGroupUsers] = useState([]);
+    const [groupImage, setGroupImage] = useState(group.imageUrl);
 
     if (!group) return null;
 
@@ -252,6 +253,19 @@ const GroupChat = (props) => {
         setShowGroupSidebar(prev => !prev);
     };
 
+    // Update groupImage when group prop changes (e.g., when switching groups)
+    useEffect(() => {
+        setGroupImage(group.imageUrl);
+    }, [group.imageUrl]);
+
+    // Handler for group image change from sidebar
+    const handleGroupImageChangedLocal = (newImageUrl) => {
+        setGroupImage(newImageUrl);
+        if (typeof onGroupImageChanged === 'function') {
+            onGroupImageChanged();
+        }
+    };
+
     return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 shadow-2xl backdrop-blur-lg border border-white/40 sm:p-0 p-1">
             <div className="w-full max-w-4xl flex flex-col h-full">
@@ -264,9 +278,9 @@ const GroupChat = (props) => {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                             </button>
                             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md overflow-hidden">
-                                {group.imageUrl ? (
+                                {groupImage ? (
                                     <img 
-                                        src={group.imageUrl} 
+                                        src={groupImage} 
                                         alt={group.name} 
                                         className="w-full h-full object-cover"
                                     />
@@ -314,9 +328,9 @@ const GroupChat = (props) => {
                         {/* DESKTOP HEADER */}
                         <div className="hidden sm:flex items-center gap-2">
                             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-300 via-pink-200 to-blue-200 border border-white shadow-md overflow-hidden">
-                                {group.imageUrl ? (
+                                {groupImage ? (
                                     <img 
-                                        src={group.imageUrl} 
+                                        src={groupImage} 
                                         alt={group.name} 
                                         className="w-full h-full object-cover"
                                     />
@@ -380,6 +394,7 @@ const GroupChat = (props) => {
                     onClose={toggleGroupSidebar}
                     group={group}
                     onGroupDeleted={onGroupDeleted}
+                    onGroupImageChanged={handleGroupImageChangedLocal}
                 />
 
                 {/* Messages */}
