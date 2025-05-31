@@ -256,7 +256,7 @@ const GroupChat = (props) => {
     // Update groupImage when group prop changes (e.g., when switching groups)
     useEffect(() => {
         setGroupImage(group.imageUrl);
-    }, [group.imageUrl]);
+    }, [group._id, group.imageUrl]);
 
     // Handler for group image change from sidebar
     const handleGroupImageChangedLocal = (newImageUrl) => {

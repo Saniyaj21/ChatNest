@@ -40,6 +40,11 @@ const GroupSidebar = ({ isOpen, onClose, group, onGroupDeleted, onGroupImageChan
         }
     }, [group?._id, isOpen]);
 
+    // Reset currentGroupImage when group changes
+    useEffect(() => {
+        setCurrentGroupImage(group?.imageUrl || null);
+    }, [group?._id, group?.imageUrl]);
+
     const handleImagePick = async (e) => {
         const file = e.target.files[0];
         if (file) {
