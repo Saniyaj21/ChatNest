@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { SignOutButton } from '@clerk/nextjs';
 
 const SidebarMenu = ({ open, onClose, anchorRef }) => {
   const menuRef = useRef(null);
@@ -42,6 +43,13 @@ const SidebarMenu = ({ open, onClose, anchorRef }) => {
       >
         Settings
       </Link>
+      <SignOutButton>
+        <button
+          className="relative z-10 px-4 py-2 text-left hover:bg-blue-50 focus:bg-blue-100 text-red-600 font-medium rounded-b-xl transition-colors duration-150 focus:outline-none w-full "
+        >
+          Log out
+        </button>
+      </SignOutButton>
     </div>
   );
 };

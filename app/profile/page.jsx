@@ -182,7 +182,7 @@ function ProfilePage() {
     return (
         <>
             <Header />
-            <div className="w-screen min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 p-2 pt-0">
+            <div className="w-full min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-100/60 via-white/80 to-purple-100/60 p-2 pt-0">
                 <div className="mt-8 w-full flex flex-col items-center">
                     <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent tracking-tight mb-6">Your Profile</h1>
                     {error && <div className="mb-4 text-red-500">{error}</div>}
